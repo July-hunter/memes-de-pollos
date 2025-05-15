@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generador de Memes</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    #memeCanvas {
+      border: 2px solid #000;
+      max-width: 100%;
+    }
+    input[type="text"] {
+      width: 300px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generador de Memes</h1>
+  <input type="file" id="imageInput" accept="image/*"><br>
+  <input type="text" id="topText" placeholder="Texto arriba"><br>
+  <input type="text" id="bottomText" placeholder="Texto abajo"><br>
+  <button onclick="generateMeme()">Generar Meme</button>
+  <button onclick="downloadMeme()">Descargar Meme</button>
+  <br><br>
+  <canvas id="memeCanvas" width="500" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById('memeCanvas');
+    const ctx = canvas.getContext('2d');
+    let image = new Image();
+
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        image.src = event.target.result;
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    image.onload = function() {
+      drawMeme();
+    };
+
+    function drawMeme() {
+      // Ajustar canvas al tamaño de la imagen
+      canvas.width = image.width;
+      canvas.height = image.height;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0);
+
+      const topText = document.getElementById('topText').value.toUpperCase();
+      const bottomText = document.getElementById('bottomText').value.toUpperCase();
+
+      ctx.fillStyle = 'white';
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 4;
+      ctx.textAlign = 'center';
+      ctx.font = `${canvas.width / 10}px Impact`;
+
+      // Texto arriba
+      ctx.fillText(topText, canvas.width / 2, canvas.height * 0.1);
+      ctx.strokeText(topText, canvas.width / 2, canvas.height * 0.1);
+
+      // Texto abajo
+      ctx.fillText(bottomText, canvas.width / 2, canvas.height * 0.95);
+      ctx.strokeText(bottomText, canvas.width / 2, canvas.height * 0.95);
+    }
+
+    function generateMeme() {
+      if (image.src) {
+        drawMeme();
+      } else {
+        alert('Primero selecciona una imagen.');
+      }
+    }
+
+    function downloadMeme() {
+      const link = document.createElement('a');
+      link.download = 'meme.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
